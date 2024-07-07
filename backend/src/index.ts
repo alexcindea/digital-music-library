@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// MongoDB connection
+// MongoDB connection : This should use enviroment variables.
 mongoose
   .connect(
     "mongodb://localhost:27017/music-library?useNewUrlParser=true&useUnifiedTopology=true"
