@@ -49,3 +49,40 @@ export const deleteArtist = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Get albums for an artist
+export const getAlbumsForArtist = async (req: Request, res: Response) => {
+  try {
+    const artist = await Artist.findOne({ name: req.params.name }).select(
+      "albums"
+    );
+    if (!artist) {
+      return res.status(404).json({ message: "Artist not found" });
+    }
+    res.json(artist.albums);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get songs for an album
+export const getSongsForAlbum = async (req: Request, res: Response) => {
+  try {
+    const artist = await Artist.findOne({ title: req.params.artistTitle });
+    if (!artist) {
+      return res.status(404).json({ message: "Artist not found" });
+    }
+
+    const album = artist.albums.find(
+      (album) => album.title === req.params.albumTitle
+    );
+    if (!album) {
+      return res.status(404).json({ message: "Album not found" });
+    }
+
+    res.json(album.songs);
+  } catch (err: any) {
+    console.log(err);
+    res.status(500).json({ message: err.message });
+  }
+};
