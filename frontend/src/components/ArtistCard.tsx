@@ -109,7 +109,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
         <Column>
           <Row>
             <Flex>
-              <AlbumIcon sx={{ color: "#A91D3A" }} />
+              <AlbumIcon sx={{ color: "#FF8B01" }} />
               <DataDescription>Albums</DataDescription>
             </Flex>
 
@@ -117,14 +117,14 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
           </Row>
           <Row>
             <Flex>
-              <PeopleIcon sx={{ color: "#A91D3A" }} />
+              <PeopleIcon sx={{ color: "#FF8B01" }} />
               <DataDescription>Followers</DataDescription>
             </Flex>
             <DataValues>{followers}</DataValues>
           </Row>
           <Row>
             <Flex>
-              <PlayCircleIcon sx={{ color: "#A91D3A" }} />
+              <PlayCircleIcon sx={{ color: "#FF8B01" }} />
               <DataDescription>Popularity</DataDescription>
             </Flex>
             <DataValues>{popularity}%</DataValues>

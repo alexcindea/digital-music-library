@@ -1,16 +1,18 @@
 import { Request, Response } from "express";
 import { Artist } from "../models/artist";
-import { getArtistInfo } from "../services/spotifyService";
+import { getAlbumInfo, getArtistInfo } from "../services/spotifyService";
 
 // Get all artists
 export const getAllArtists = async (req: Request, res: Response) => {
   try {
     const artists = await Artist.find();
+    console.log("Checking logs");
 
     // Fetch artist images from Spotify
     const artistsWithImages = await Promise.all(
       artists.map(async (artist) => {
         const spotifyInfo = await getArtistInfo(artist.name);
+        //console.log("Spotify Info", spotifyInfo);
         return {
           ...artist.toObject(),
           image:
@@ -69,15 +71,40 @@ export const deleteArtist = async (req: Request, res: Response) => {
 // Get albums for an artist
 export const getAlbumsForArtist = async (req: Request, res: Response) => {
   try {
+    // Find the artist in MongoDB by name
     const artist = await Artist.findOne({ name: req.params.name }).select(
       "albums"
     );
     if (!artist) {
+      console.log("Artist not found:", req.params.name);
       return res.status(404).json({ message: "Artist not found" });
     }
 
-    res.json(artist.albums);
+    // Log the found artist
+    console.log("Artist found:", artist);
+
+    // Fetch Spotify artist info to get the Spotify artist ID
+    const spotifyArtistInfo = await getArtistInfo(req.params.name);
+
+    // Fetch albums info from Spotify using the Spotify artist ID
+    const spotifyAlbums = await getAlbumInfo(spotifyArtistInfo.id);
+
+    // Combine MongoDB albums with Spotify images
+    const albumsWithImages = artist.albums.map((album) => {
+      const spotifyAlbum = spotifyAlbums.find(
+        (sa: any) => sa.name.toLowerCase() === album.title.toLowerCase()
+      );
+      return {
+        ...album.toObject(),
+        image: spotifyAlbum ? spotifyAlbum.images[0].url : null, // Use the first image
+      };
+    });
+
+    // Send the image album data in the response
+    res.json(albumsWithImages);
   } catch (err: any) {
+    // Log the error
+    console.error("Error fetching albums for artist:", err.message);
     res.status(500).json({ message: err.message });
   }
 };

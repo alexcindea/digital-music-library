@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   Grid,
   InputBase,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import ArtistCard from "../components/ArtistCard";
 import Background from "../components/Background";
@@ -21,14 +19,14 @@ export const InputBaseStyled = styled(InputBase)({
   marginLeft: "16px",
 });
 
-const TitleContainer = styled("div")`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  margin-top: 16px;
-`;
+const TitleContainer = styled("div")({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "baseline",
+  marginBottom: "16px",
+  marginTop: "16px",
+});
 
 export const Search = styled("div")({
   backgroundColor: "white",
@@ -50,23 +48,29 @@ export const SearchIconStyled = styled(SearchIcon)({
 });
 
 const ArtistList: React.FC = () => {
+  const navigate = useNavigate();
+
   const [artists, setArtists] = useState<any[]>([]);
   const [filteredArtists, setFilteredArtists] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchArtists = async () => {
-      const response = await api.get("/artists");
-      setArtists(response.data);
-      setFilteredArtists(response.data);
-
-      console.log("Response:", response.data);
+      try {
+        const response = await api.get("/artists");
+        setArtists(response.data);
+        setFilteredArtists(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch artists:", error);
+        setLoading(false);
+      }
     };
     fetchArtists();
   }, []);
 
   const handleSearch = (event: any) => {
-    console.log("event", event.target.value);
-
+    console.log(event.target.value);
     if (event.target.value === "") {
       setFilteredArtists(artists);
     } else {
@@ -78,18 +82,34 @@ const ArtistList: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Container
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Container>
+    );
+  }
+
   return (
     <>
       <Background />
       <Container>
         <TitleContainer>
+          <div></div>
           <Typography variant="h4" gutterBottom sx={{ weight: "700" }}>
             Artists
           </Typography>
-
           <Button
             variant="contained"
             sx={{ borderRadius: "10px", backgroundColor: "#FF8B01" }}
+            onClick={() => navigate("/add-artist")}
           >
             Add Artist
           </Button>
@@ -97,10 +117,9 @@ const ArtistList: React.FC = () => {
 
         <Search>
           <InputBaseStyled
-            placeholder="Search hive name..."
+            placeholder="Search artist name..."
             onChange={handleSearch}
           />
-
           <SearchIconStyled />
         </Search>
 

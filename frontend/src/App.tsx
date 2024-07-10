@@ -4,6 +4,7 @@ import ArtistList from "./pages/ArtistList";
 import AlbumList from "./pages/AlbumList";
 import SongsList from "./pages/SongsList";
 import TestView from "./pages/TestView";
+import AddArtist from "./pages/AddArtist";
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
           element={<SongsList />}
         />
         <Route path="/test" element={<TestView />} />
+        <Route path="/add-artist" element={<AddArtist />} />
       </Routes>
     </Router>
   );

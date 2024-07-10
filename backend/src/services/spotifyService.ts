@@ -49,3 +49,21 @@ export const getArtistInfo = async (artistName: string) => {
 
   return response.data.artists.items[0];
 };
+
+export const getAlbumInfo = async (artistId: string) => {
+  const token = await getAccessToken();
+  const response = await axios.get(
+    `https://api.spotify.com/v1/artists/${artistId}/albums`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (response.data.items.length === 0) {
+    throw new Error("Albums not found");
+  }
+
+  return response.data.items;
+};
