@@ -6,6 +6,7 @@ import {
   deleteArtist,
   getAlbumsForArtist,
   getSongsForAlbum,
+  getArtistDetails,
 } from "../controllers/artistController";
 
 const router = Router();
@@ -16,5 +17,6 @@ router.put("/:id", updateArtist);
 router.delete("/:id", deleteArtist);
 router.get("/:name/albums", getAlbumsForArtist);
 router.get("/:artistName/albums/:albumTitle/songs", getSongsForAlbum);
+router.get("/:id/details", getArtistDetails);
 
 export default router;

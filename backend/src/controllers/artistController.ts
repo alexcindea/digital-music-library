@@ -1,11 +1,27 @@
 import { Request, Response } from "express";
 import { Artist } from "../models/artist";
+import { getArtistInfo } from "../services/spotifyService";
 
 // Get all artists
 export const getAllArtists = async (req: Request, res: Response) => {
   try {
     const artists = await Artist.find();
-    res.json(artists);
+
+    // Fetch artist images from Spotify
+    const artistsWithImages = await Promise.all(
+      artists.map(async (artist) => {
+        const spotifyInfo = await getArtistInfo(artist.name);
+        return {
+          ...artist.toObject(),
+          image:
+            spotifyInfo.images.length > 0 ? spotifyInfo.images[0].url : null, // Use the first image
+          followers: spotifyInfo.followers,
+          popularity: spotifyInfo.popularity,
+        };
+      })
+    );
+
+    res.json(artistsWithImages);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
@@ -59,6 +75,7 @@ export const getAlbumsForArtist = async (req: Request, res: Response) => {
     if (!artist) {
       return res.status(404).json({ message: "Artist not found" });
     }
+
     res.json(artist.albums);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -83,6 +100,27 @@ export const getSongsForAlbum = async (req: Request, res: Response) => {
     res.json(album.songs);
   } catch (err: any) {
     console.log(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get artist details with Spotify info
+export const getArtistDetails = async (req: Request, res: Response) => {
+  try {
+    const artist = await Artist.findById(req.params.id);
+    if (!artist) {
+      return res.status(404).json({ message: "Artist not found" });
+    }
+
+    const spotifyInfo = await getArtistInfo(artist.name);
+    const artistWithImages = {
+      ...artist.toObject(),
+      image: spotifyInfo.images.length > 0 ? spotifyInfo.images[0].url : null, // Use the first image
+      bio: spotifyInfo.genres.join(", "), // Use genres as bio for now
+    };
+
+    res.json(artistWithImages);
+  } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 };
