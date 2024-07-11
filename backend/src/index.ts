@@ -11,11 +11,11 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const MONGO_URI = process.env.MONGO_URI || "mongodb://db:27017/music-library";
+
 // This should use enviroment variables.
 mongoose
-  .connect(
-    "mongodb://localhost:27017/music-library?useNewUrlParser=true&useUnifiedTopology=true"
-  )
+  .connect(MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
