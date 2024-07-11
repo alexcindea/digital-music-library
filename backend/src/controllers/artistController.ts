@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { Artist } from "../models/artist";
 import { getAlbumInfo, getArtistInfo } from "../services/spotifyService";
+import { IAlbum } from "../models/album";
+import { body, validationResult } from "express-validator";
 
 // Get all artists
 export const getAllArtists = async (req: Request, res: Response) => {
@@ -189,3 +191,40 @@ export const getArtistSuggestions = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const addAlbumToArtist = [
+  // Validation rules
+  body("title").notEmpty().withMessage("Title is required"),
+  body("description").notEmpty().withMessage("Description is required"),
+  body("songs")
+    .isArray({ min: 1 })
+    .withMessage("At least one song is required"),
+  body("songs.*.title").notEmpty().withMessage("Song title is required"),
+  body("songs.*.length").notEmpty().withMessage("Song length is required"),
+
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name } = req.params;
+    const { title, description, songs } = req.body;
+
+    try {
+      const artist = await Artist.findOne({ name });
+
+      if (!artist) {
+        return res.status(404).json({ message: "Artist not found" });
+      }
+
+      const newAlbum = { title, description, songs };
+      artist.albums.push(newAlbum as any);
+      await artist.save();
+
+      res.status(201).json(newAlbum);
+    } catch (err: any) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+];
