@@ -58,7 +58,7 @@ export const updateArtist = async (req: Request, res: Response) => {
 // Delete an artist
 export const deleteArtist = async (req: Request, res: Response) => {
   try {
-    const artist = await Artist.findByIdAndDelete(req.params.id);
+    const artist = await Artist.findOneAndDelete({ name: req.params.name });
     if (!artist) {
       return res.status(404).json({ message: "Artist not found" });
     }
@@ -79,9 +79,6 @@ export const getAlbumsForArtist = async (req: Request, res: Response) => {
       console.log("Artist not found:", req.params.name);
       return res.status(404).json({ message: "Artist not found" });
     }
-
-    // Log the found artist
-    console.log("Artist found:", artist);
 
     // Fetch Spotify artist info to get the Spotify artist ID
     const spotifyArtistInfo = await getArtistInfo(req.params.name);
@@ -147,6 +144,47 @@ export const getArtistDetails = async (req: Request, res: Response) => {
     };
 
     res.json(artistWithImages);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteAlbum = async (req: Request, res: Response) => {
+  try {
+    const artist = await Artist.findOne({ name: req.params.name });
+    if (!artist) {
+      return res.status(404).json({ message: "Artist not found" });
+    }
+    const albumIndex = artist.albums.findIndex(
+      (album) => album.title === req.params.albumTitle
+    );
+    if (albumIndex === -1) {
+      return res.status(404).json({ message: "Album not found" });
+    }
+    artist.albums.splice(albumIndex, 1);
+    await artist.save();
+    res.json({ message: "Album deleted" });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get artist search suggestions
+export const getArtistSuggestions = async (req: Request, res: Response) => {
+  try {
+    const { query } = req.query;
+
+    console.log("Query: ", query);
+    if (!query) {
+      return res.status(400).json({ message: "Query parameter is required" });
+    }
+
+    const regex = new RegExp(query as string, "i");
+    const artists = await Artist.find({ name: regex }).select("name");
+
+    const suggestions = artists.map((artist) => artist.name);
+
+    res.json(suggestions);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }

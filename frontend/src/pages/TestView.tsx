@@ -10,6 +10,7 @@ import {
   Grid,
 } from "@mui/material";
 import ArtistCard from "../components/ArtistCard";
+import Autocomplete from "../components/Autocomplete";
 
 const artistsMock = [
   {

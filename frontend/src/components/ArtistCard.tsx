@@ -91,7 +91,6 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
   popularity,
   link,
 }) => {
-  console.log("Bio", bio);
   return (
     <Box
       component={Link}

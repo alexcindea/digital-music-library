@@ -7,6 +7,8 @@ import {
   getAlbumsForArtist,
   getSongsForAlbum,
   getArtistDetails,
+  deleteAlbum,
+  getArtistSuggestions,
 } from "../controllers/artistController";
 
 const router = Router();
@@ -14,9 +16,11 @@ const router = Router();
 router.get("/", getAllArtists);
 router.post("/", createArtist);
 router.put("/:id", updateArtist);
-router.delete("/:id", deleteArtist);
+router.delete("/:name", deleteArtist);
 router.get("/:name/albums", getAlbumsForArtist);
 router.get("/:artistName/albums/:albumTitle/songs", getSongsForAlbum);
+router.get("/suggestions", getArtistSuggestions);
 router.get("/:id/details", getArtistDetails);
+router.route("/:name/albums/:albumTitle").delete(deleteAlbum);
 
 export default router;

@@ -13,6 +13,7 @@ import ArtistCard from "../components/ArtistCard";
 import Background from "../components/Background";
 import styled from "@emotion/styled";
 import SearchIcon from "@mui/icons-material/Search";
+import Autocomplete from "../components/Autocomplete";
 
 export const InputBaseStyled = styled(InputBase)({
   width: "95%",
@@ -70,7 +71,7 @@ const ArtistList: React.FC = () => {
   }, []);
 
   const handleSearch = (event: any) => {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     if (event.target.value === "") {
       setFilteredArtists(artists);
     } else {
@@ -100,7 +101,7 @@ const ArtistList: React.FC = () => {
   return (
     <>
       <Background />
-      <Container>
+      <Container sx={{ marginBottom: "20px" }}>
         <TitleContainer>
           <div></div>
           <Typography variant="h4" gutterBottom sx={{ weight: "700" }}>
@@ -114,15 +115,7 @@ const ArtistList: React.FC = () => {
             Add Artist
           </Button>
         </TitleContainer>
-
-        <Search>
-          <InputBaseStyled
-            placeholder="Search artist name..."
-            onChange={handleSearch}
-          />
-          <SearchIconStyled />
-        </Search>
-
+        <Autocomplete />
         <Grid container spacing={4} sx={{ marginTop: "20px" }}>
           {filteredArtists.map((artist) => (
             <Grid item xs={12} sm={6} md={4} key={artist.id}>

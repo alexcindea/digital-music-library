@@ -8,6 +8,7 @@ import {
   Box,
   IconButton,
   Divider,
+  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -18,9 +19,29 @@ const AddArtist: React.FC = () => {
   const [albums, setAlbums] = useState([
     { title: "", description: "", songs: [{ title: "", length: "" }] },
   ]);
+  const [validationError, setValidationError] = useState("");
   const navigate = useNavigate();
 
   const handleAddArtist = async () => {
+    setValidationError(""); // Clear previous validation errors
+
+    if (name.trim() === "") {
+      setValidationError("Artist name is required.");
+      return;
+    }
+    if (albums.length === 0 || albums[0].title.trim() === "") {
+      setValidationError("At least one album with a title is required.");
+      return;
+    }
+    for (let album of albums) {
+      if (album.songs.length === 0 || album.songs[0].title.trim() === "") {
+        setValidationError(
+          "Each album must have at least one song with a title."
+        );
+        return;
+      }
+    }
+
     const newArtist = {
       name,
       albums,
@@ -83,7 +104,7 @@ const AddArtist: React.FC = () => {
   return (
     <Container>
       <Typography variant="h4" gutterBottom sx={{ marginTop: "20px" }}>
-        Add New Artist
+        Add a new artist
       </Typography>
       <Box component="form" noValidate autoComplete="off">
         <div
@@ -94,6 +115,11 @@ const AddArtist: React.FC = () => {
             justifyContent: "space-around",
           }}
         >
+          {validationError && (
+            <Alert severity="warning" sx={{ marginBottom: "16px" }}>
+              {validationError}
+            </Alert>
+          )}
           <div>
             <TextField
               label="Artist Name"
