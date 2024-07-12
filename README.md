@@ -98,5 +98,3 @@ This project is a digital music library where you can visualize artists and thei
 
 Once the application is running, you can access it at `http://localhost:3000`. The backend API will be available at `http://localhost:5000`.
 
-
-Contrib
